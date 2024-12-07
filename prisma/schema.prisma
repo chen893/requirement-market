@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关联
+  requirements Requirement[]
+  comments     Comment[]
+  likes        Like[]
+
+  @@map("users")
+}
+
+model Requirement {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  budget      Float?
+  deadline    DateTime?
+  status      String   @default("open") // open, in_progress, completed, cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 关联
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  comments  Comment[]
+  likes     Like[]
+  tags      Tag[]
+
+  @@map("requirements")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关联
+  userId         String
+  user           User        @relation(fields: [userId], references: [id])
+  requirementId  String
+  requirement    Requirement @relation(fields: [requirementId], references: [id])
+
+  @@map("comments")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // 关联
+  userId         String
+  user           User        @relation(fields: [userId], references: [id])
+  requirementId  String
+  requirement    Requirement @relation(fields: [requirementId], references: [id])
+
+  @@unique([userId, requirementId])
+  @@map("likes")
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关联
+  requirements Requirement[]
+
+  @@map("tags")
+} 
