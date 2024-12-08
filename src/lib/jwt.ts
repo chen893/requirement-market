@@ -39,7 +39,7 @@ export async function validateToken(token: string): Promise<JWTPayload | null> {
     // 移除 Bearer 前缀
     const actualToken = token.replace('Bearer ', '')
     const { payload } = await jwtVerify(actualToken, JWT_SECRET)
-    return payload as JWTPayload
+    return payload as unknown as JWTPayload
   } catch (error) {
     console.error('Error validating token:', error)
     return null

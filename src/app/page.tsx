@@ -122,9 +122,8 @@ export default function HomePage() {
 
   return (
     <div className="bg-white">
-      {/* Hero section */}
+
       <div className="relative isolate">
-        {/* 背景装饰 */}
         <div
           className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
           aria-hidden="true"

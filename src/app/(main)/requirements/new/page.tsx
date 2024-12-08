@@ -62,7 +62,7 @@ export default function NewRequirementPage() {
     try {
       setAnalyzing(true)
       setError('')
-      const response = await apiClient.post('/requirements/analyze', {
+      const response = await apiClient.post<AIAnalysis>('/requirements/analyze', {
         title,
         description,
       })
