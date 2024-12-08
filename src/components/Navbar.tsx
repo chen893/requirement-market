@@ -1,125 +1,179 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useAuth } from '@/contexts/auth'
-import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Bell, Menu, X } from 'lucide-react'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { cn } from '@/lib/utils'
+
+const navigation = [
+  { name: '浏览需求', href: '/requirements' },
+  { name: '发布需求', href: '/requirements/new' },
+]
 
 export default function Navbar() {
+  const pathname = usePathname()
   const { user, logout } = useAuth()
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
 
-  const handleLogout = async () => {
-    await logout()
-  }
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <nav className="bg-white shadow">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-xl font-bold text-gray-800">
-                需求市场
-              </Link>
-            </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link
-                href="/requirements"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900"
-              >
-                浏览需求
-              </Link>
-              {user && (
-                <Link
-                  href="/requirements/new"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900"
-                >
-                  发布需求
-                </Link>
-              )}
-            </div>
+    <header
+      className={cn(
+        'fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
+        isScrolled ? 'border-border' : 'border-transparent'
+      )}
+    >
+      <nav className="container mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <div className="flex lg:flex-1">
+            <Link href="/" className="-m-1.5 p-1.5">
+              <span className="text-xl font-bold text-foreground">需求市场</span>
+            </Link>
           </div>
-          <div className="flex items-center">
-            {user ? (
-              <div className="ml-3 relative">
-                <div>
-                  <button
-                    type="button"
-                    className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    id="user-menu"
-                    aria-expanded="false"
-                    aria-haspopup="true"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  >
-                    <span className="sr-only">打开用户菜单</span>
-                    {user.avatar ? (
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src={user.avatar}
-                        alt={user.username}
-                      />
-                    ) : (
-                      <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                        {user.username[0].toUpperCase()}
-                      </div>
+
+          {/* Mobile menu */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                className="lg:hidden"
+                size="icon"
+                aria-label="Toggle menu"
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <nav className="flex flex-col gap-4">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      'text-lg font-medium transition-colors hover:text-primary',
+                      pathname === item.href
+                        ? 'text-foreground'
+                        : 'text-muted-foreground'
                     )}
-                  </button>
-                </div>
-                {isDropdownOpen && (
-                  <div
-                    className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="user-menu"
                   >
-                    <div className="px-4 py-2 text-sm text-gray-700 border-b">
-                      {user.username}
-                    </div>
-                    <Link
-                      href="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      role="menuitem"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      个人资料
+                    {item.name}
+                  </Link>
+                ))}
+                {!user ? (
+                  <>
+                    <Link href="/login">
+                      <Button className="w-full" variant="outline">
+                        登录
+                      </Button>
                     </Link>
-                    <Link
-                      href="/requirements/my"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      role="menuitem"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      我的需求
+                    <Link href="/register">
+                      <Button className="w-full">注册</Button>
                     </Link>
-                    <button
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      role="menuitem"
-                      onClick={handleLogout}
+                  </>
+                ) : null}
+              </nav>
+            </SheetContent>
+          </Sheet>
+
+          {/* Desktop menu */}
+          <div className="hidden lg:flex lg:gap-x-8">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  'text-sm font-medium transition-colors hover:text-primary',
+                  pathname === item.href
+                    ? 'text-foreground'
+                    : 'text-muted-foreground'
+                )}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+
+          {/* Right section */}
+          <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-4">
+            {user ? (
+              <>
+                {/* Notifications */}
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-600" />
+                </Button>
+
+                {/* User menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-8 w-8 rounded-full"
+                    >
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage
+                          src={user.avatar}
+                          alt={user.username}
+                        />
+                        <AvatarFallback>
+                          {user.username[0].toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>我的账户</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href={`/users/${user.id}`}>个人主页</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings">设置</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-red-600 focus:text-red-600"
+                      onClick={() => logout()}
                     >
                       退出登录
-                    </button>
-                  </div>
-                )}
-              </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
-              <div className="flex space-x-4">
-                <Link
-                  href="/login"
-                  className="text-gray-900 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  登录
+              <>
+                <Link href="/login">
+                  <Button variant="ghost">登录</Button>
                 </Link>
-                <Link
-                  href="/register"
-                  className="bg-blue-600 text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  注册
+                <Link href="/register">
+                  <Button>注册</Button>
                 </Link>
-              </div>
+              </>
             )}
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   )
 } 

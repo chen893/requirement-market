@@ -21,9 +21,9 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={inter.className}>
         <AuthProvider>
-          <div className="min-h-screen bg-gray-50">
+          <div className="min-h-screen bg-gray-50 absolute top-0 left-0 right-0 bottom-0">
             <Navbar />
-            <main>{children}</main>
+            <main className="mt-16">{children}</main>
           </div>
         </AuthProvider>
       </body>

@@ -62,7 +62,7 @@
 
 ### 安装步骤
 
-1. ���隆项目
+1. 克隆项目
 \`\`\`bash
 git clone https://github.com/yourusername/requirement-market.git
 cd requirement-market
@@ -108,7 +108,7 @@ pnpm dev
 
 ### 评论相关
 - GET `/api/requirements/:id/comments` - 获取评论列表
-- POST `/api/requirements/:id/comments` - 发布评论
+- POST `/api/requirements/:id/comments` - 发布��论
 
 ### 点赞相关
 - GET `/api/requirements/:id/like-status` - 获取点赞状态
@@ -153,3 +153,137 @@ src/
 ## 致谢
 
 感谢所有为这个项目做出贡献的开发者！
+
+## 部署指南
+
+### Vercel 部署（推荐）
+
+1. **准备工作**
+   - 注册 [Vercel](https://vercel.com) 账号
+   - 将项目推送到 GitHub 仓库
+
+2. **数据库配置**
+   - 注册 [Supabase](https://supabase.com) 或其他 PostgreSQL 数据库服务
+   - 创建新的数据库
+   - 获取数据库连接字符串
+
+3. **Vercel 部署步骤**
+   - 在 Vercel 控制台点击 "New Project"
+   - 导入你的 GitHub 仓库
+   - 配置环境变量：
+     ```
+     DATABASE_URL="your-postgresql-connection-string"
+     JWT_SECRET="your-jwt-secret"
+     NEXT_PUBLIC_API_URL="https://your-domain.vercel.app"
+     ```
+   - 点击 "Deploy" 开始部署
+
+4. **数据库迁移**
+   ```bash
+   # 本地执行数据库迁移
+   pnpm prisma migrate deploy
+   ```
+
+### 自托管部署
+
+1. **服务器要求**
+   - Node.js 16+
+   - PostgreSQL 数据库
+   - Nginx（可选，用于反向代理）
+
+2. **部署步骤**
+   ```bash
+   # 克隆项目
+   git clone https://github.com/chen893/requirement-market.git
+   cd requirement-market
+
+   # 安装依赖
+   pnpm install
+
+   # 构建项目
+   pnpm build
+
+   # 启动服务
+   pnpm start
+   ```
+
+3. **Nginx 配置示例**
+   ```nginx
+   server {
+     listen 80;
+     server_name your-domain.com;
+
+     location / {
+       proxy_pass http://localhost:3000;
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection 'upgrade';
+       proxy_set_header Host $host;
+       proxy_cache_bypass $http_upgrade;
+     }
+   }
+   ```
+
+4. **使用 PM2 管理进程**
+   ```bash
+   # 安装 PM2
+   npm install -g pm2
+
+   # 启动服务
+   pm2 start npm --name "requirement-market" -- start
+
+   # 设置开机自启
+   pm2 startup
+   pm2 save
+   ```
+
+### 环境变量配置
+
+在生产环境中需要配置以下环境变量：
+
+```env
+# 数据库配置
+DATABASE_URL="postgresql://username:password@localhost:5432/requirement_market"
+
+# JWT 配置
+JWT_SECRET="your-jwt-secret"
+
+# OPENAI_BASE_URL 配置
+OPENAI_BASE_URL="xxx"
+
+#OPENAI_API_KEY 配置
+OPENAI_API_KEY="xxx"
+
+
+# 其他可选配置
+NODE_ENV="production"
+PORT="3000"
+```
+
+### 部署检查清单
+
+- [ ] 数据库配置正确
+- [ ] 环境变量设置完整
+- [ ] 数据库迁移已执行
+- [ ] CORS 配置正确
+- [ ] SSL 证书配置（如需要）
+- [ ] 文件上传配置（如需要）
+- [ ] 错误监控配置（如需要）
+- [ ] 备份策略制定
+
+### 性能优化建议
+
+1. **数据库优化**
+   - 添加必要的索引
+   - 配置连接池
+   - 设置适当的缓存策略
+
+2. **前端优化**
+   - 启用静态资源缓存
+   - 配置 CDN（可选）
+   - 启用图片优化
+
+3. **服务器优化**
+   - 配置适当的 Node.js 内存限制
+   - 启用 Gzip 压缩
+   - 配置请求限流

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { formatRelativeTime } from '@/lib/utils'
 import apiClient from '@/lib/api-client'
-import { toast } from 'react-hot-toast'
+import toast, {  Toaster } from 'react-hot-toast'
 
 interface User {
   id: string
@@ -223,53 +223,9 @@ export default function RequirementDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="bg-gray-50 py-8 min-h-[calc(100vh-10)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* 面包屑导��� */}
-        <nav className="flex mb-8" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-4">
-            <li>
-              <div>
-                <Link href="/" className="text-gray-400 hover:text-gray-500">
-                  首页
-                </Link>
-              </div>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <svg
-                  className="h-5 w-5 flex-shrink-0 text-gray-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  aria-hidden="true"
-                >
-                  <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-                </svg>
-                <Link
-                  href="/requirements"
-                  className="ml-4 text-gray-400 hover:text-gray-500"
-                >
-                  需求列表
-                </Link>
-              </div>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <svg
-                  className="h-5 w-5 flex-shrink-0 text-gray-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  aria-hidden="true"
-                >
-                  <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-                </svg>
-                <span className="ml-4 text-gray-500" aria-current="page">
-                  需求详情
-                </span>
-              </div>
-            </li>
-          </ol>
-        </nav>
+
 
         <div className="lg:flex lg:items-start lg:space-x-8">
           {/* 主要内容 */}
@@ -619,6 +575,7 @@ export default function RequirementDetailPage() {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   )
 } 

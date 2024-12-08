@@ -2,6 +2,7 @@ import OpenAI from 'openai'
 import type { AIAnalysis } from '@/types'
 
 const openai = new OpenAI({
+  baseURL: process.env.OPENAI_BASE_URL,
   apiKey: process.env.OPENAI_API_KEY,
 })
 
@@ -27,10 +28,20 @@ export async function analyzeRequirement(
 - techStack: 建议的技术栈（字符串数组）
 - timeline: 预计开发周期（字符串）
 - suggestions: 具体建议（字符串数组）
+
+示例：
+{
+  "feasibility": "可行",
+  "techStack": ["React", "Next.js", "Tailwind CSS"],
+  "timeline": "2周",
+  "suggestions": ["使用Next.js框架", "采用Tailwind CSS进行样式设计"]
+}
 `
 
+    console.log('openai.chat.completions.create', openai.chat.completions.create)
     const response = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4',
+      // process.env.OPENAI_MODEL || 
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',

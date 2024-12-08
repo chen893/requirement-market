@@ -175,7 +175,7 @@ export default function RequirementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="bg-gray-50 py-8 min-h-[calc(100vh-10)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* 页面标题 */}
         <div className="md:flex md:items-center md:justify-between">

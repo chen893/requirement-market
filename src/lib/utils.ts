@@ -1,11 +1,9 @@
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-// 合并 Tailwind CSS 类名
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
 // 格式化日期
 export function formatDate(date: string | Date) {
   return new Date(date).toLocaleDateString('zh-CN', {
@@ -14,29 +12,40 @@ export function formatDate(date: string | Date) {
     day: 'numeric',
   })
 }
-
-// 格式化相对时间
 export function formatRelativeTime(date: string | Date) {
   const now = new Date()
-  const target = new Date(date)
-  const diff = now.getTime() - target.getTime()
-  const seconds = Math.floor(diff / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
+  const past = new Date(date)
+  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000)
 
-  if (days > 30) {
-    return formatDate(date)
-  } else if (days > 0) {
-    return `${days} 天前`
-  } else if (hours > 0) {
-    return `${hours} 小时前`
-  } else if (minutes > 0) {
-    return `${minutes} 分钟前`
-  } else {
+  if (diffInSeconds < 60) {
     return '刚刚'
   }
+
+  
+  const diffInMinutes = Math.floor(diffInSeconds / 60)
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} 分钟前`
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  if (diffInHours < 24) {
+    return `${diffInHours} 小时前`
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24)
+  if (diffInDays < 30) {
+    return `${diffInDays} 天前`
+  }
+
+  const diffInMonths = Math.floor(diffInDays / 30)
+  if (diffInMonths < 12) {
+    return `${diffInMonths} 个月前`
+  }
+
+  const diffInYears = Math.floor(diffInMonths / 12)
+  return `${diffInYears} 年前`
 }
+
 
 // 截断文本
 export function truncateText(text: string, length: number) {
