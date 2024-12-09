@@ -33,7 +33,7 @@ export async function GET(
             },
           },
           orderBy: {
-            created_at: 'desc',
+            createdAt: 'desc',
           },
         },
         _count: {
@@ -133,7 +133,7 @@ export async function PUT(
     }
 
     // 检查是否是需求的创建者
-    if (existingRequirement.user_id !== payload.userId) {
+    if (existingRequirement.userId !== payload.userId) {
       return NextResponse.json(
         {
           success: false,
@@ -345,7 +345,7 @@ export async function DELETE(
     }
 
     // 检查是否是需求的创建者
-    if (existingRequirement.user_id !== payload.userId) {
+    if (existingRequirement.userId !== payload.userId) {
       return NextResponse.json(
         {
           success: false,
