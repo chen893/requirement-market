@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { type NextRequest } from 'next/server'
-import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { validateToken } from '@/lib/jwt'
 
@@ -174,11 +173,10 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')
 
     // 构建查询条件
-    const where: Prisma.RequirementWhereInput = {}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: any = {}
     if (status) {
-      where: {
-        status
-      }
+      where.status = status
     }
     if (tag) {
       where.tags = {
