@@ -8,7 +8,7 @@ const openai = new OpenAI({
 
 export async function analyzeRequirement(
   title: string,
-  description: string
+  description: string,
 ): Promise<AIAnalysis> {
   try {
     const prompt = `
@@ -38,9 +38,12 @@ export async function analyzeRequirement(
 }
 `
 
-    console.log('openai.chat.completions.create', openai.chat.completions.create)
+    console.log(
+      'openai.chat.completions.create',
+      openai.chat.completions.create,
+    )
     const response = await openai.chat.completions.create({
-      // process.env.OPENAI_MODEL || 
+      // process.env.OPENAI_MODEL ||
       model: 'gpt-4o-mini',
       messages: [
         {
@@ -72,7 +75,7 @@ export async function analyzeRequirement(
       techStack: analysis.techStack,
       timeline: analysis.timeline,
       suggestions: analysis.suggestions,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     }
   } catch (error) {
     console.error('OpenAI API error:', error)
@@ -80,4 +83,4 @@ export async function analyzeRequirement(
   }
 }
 
-export default openai 
+export default openai

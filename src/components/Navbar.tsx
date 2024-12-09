@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Bell, Menu, X } from 'lucide-react'
+import { Bell, Menu } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 
@@ -40,7 +40,7 @@ export default function Navbar() {
     <header
       className={cn(
         'fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
-        isScrolled ? 'border-border' : 'border-transparent'
+        isScrolled ? 'border-border' : 'border-transparent',
       )}
     >
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
@@ -48,7 +48,9 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex lg:flex-1">
             <Link href="/" className="-m-1.5 p-1.5">
-              <span className="text-xl font-bold text-foreground">需求市场</span>
+              <span className="text-xl font-bold text-foreground">
+                需求市场
+              </span>
             </Link>
           </div>
 
@@ -74,7 +76,7 @@ export default function Navbar() {
                       'text-lg font-medium transition-colors hover:text-primary',
                       pathname === item.href
                         ? 'text-foreground'
-                        : 'text-muted-foreground'
+                        : 'text-muted-foreground',
                     )}
                   >
                     {item.name}
@@ -106,7 +108,7 @@ export default function Navbar() {
                   'text-sm font-medium transition-colors hover:text-primary',
                   pathname === item.href
                     ? 'text-foreground'
-                    : 'text-muted-foreground'
+                    : 'text-muted-foreground',
                 )}
               >
                 {item.name}
@@ -132,10 +134,7 @@ export default function Navbar() {
                       className="relative h-8 w-8 rounded-full"
                     >
                       <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={user.avatar}
-                          alt={user.username}
-                        />
+                        <AvatarImage src={user.avatar} alt={user.username} />
                         <AvatarFallback>
                           {user.username[0].toUpperCase()}
                         </AvatarFallback>
@@ -176,4 +175,4 @@ export default function Navbar() {
       </nav>
     </header>
   )
-} 
+}

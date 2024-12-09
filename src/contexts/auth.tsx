@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import {
   createContext,
@@ -6,126 +6,122 @@ import {
   useEffect,
   useState,
   ReactNode,
-} from "react";
-import apiClient from "@/lib/api-client";
+} from 'react'
+import apiClient from '@/lib/api-client'
 
 interface User {
-  id: string;
-  username: string;
-  email: string;
-  avatar?: string;
-  createdAt: Date;
+  id: string
+  username: string
+  email: string
+  avatar?: string
+  created_at: Date
 }
 
 interface AuthResponse {
-  user: User;
-  token: string;
+  user: User
+  token: string
 }
 
 interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (
-    username: string,
-    email: string,
-    password: string
-  ) => Promise<void>;
-  logout: () => Promise<void>;
+  user: User | null
+  loading: boolean
+  login: (email: string, password: string) => Promise<void>
+  register: (username: string, email: string, password: string) => Promise<void>
+  logout: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
   // 登录函数
   const login = async (email: string, password: string) => {
     try {
       const data = await apiClient.post<AuthResponse>(
-        "/auth/login",
+        '/auth/login',
         { email, password },
-        { requireAuth: false }
-      );
-      localStorage.setItem("token", data.token);
-      setUser(data.user);
+        { requireAuth: false },
+      )
+      localStorage.setItem('token', data.token)
+      setUser(data.user)
     } catch (error) {
-      throw error;
+      throw error
     }
-  };
+  }
 
   // 注册函数
   const register = async (
     username: string,
     email: string,
-    password: string
+    password: string,
   ) => {
     try {
       await apiClient.post<User>(
-        "/auth/register",
+        '/auth/register',
         { username, email, password },
-        { requireAuth: false }
-      );
+        { requireAuth: false },
+      )
     } catch (error) {
-      throw error;
+      throw error
     }
-  };
+  }
 
   // 注销函数
   const logout = async () => {
     try {
-      await apiClient.post("/auth/logout");
-      localStorage.removeItem("token");
-      setUser(null);
+      await apiClient.post('/auth/logout')
+      localStorage.removeItem('token')
+      setUser(null)
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error)
     }
-  };
+  }
 
   // 获取当前用户信息
   const getCurrentUser = async () => {
     try {
-      const token = await localStorage.getItem("token");
+      const token = await localStorage.getItem('token')
       if (!token) {
-        setLoading(false);
-        return;
+        setLoading(false)
+        return
       }
 
-      const user = await apiClient.get<User>("/auth/me");
-      setUser(user);
+      const user = await apiClient.get<User>('/auth/me')
+      setUser(user)
     } catch (error) {
-      console.error("Get current user error:", error);
+      console.error('Get current user error:', error)
       // 如果获取用户信息失败，清除 token
-      localStorage.removeItem("token");
-      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+      localStorage.removeItem('token')
+      document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // 在组件挂载时获取用户信息
   useEffect(() => {
-    getCurrentUser();
-  }, []);
+    getCurrentUser()
+  }, [])
 
   // 添加 token 变化监听
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "token") {
+      if (e.key === 'token') {
         if (!e.newValue) {
-          setUser(null);
+          setUser(null)
         } else {
-          getCurrentUser();
+          getCurrentUser()
         }
       }
-    };
+    }
 
-    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener('storage', handleStorageChange)
     return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [])
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout }}>
@@ -137,13 +133,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         children
       )}
     </AuthContext.Provider>
-  );
+  )
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider')
   }
-  return context;
+  return context
 }

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,80 +7,81 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RequirementStatus {
+  OPEN
+  CLOSED
+  IN_PROGRESS
+}
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
+  id        String    @id @default(uuid()) // Supabase 默认使用 uuid
+  email     String    @unique
+  username  String    @unique
   password  String
   avatar    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
-  // 关联
   requirements Requirement[]
   comments     Comment[]
   likes        Like[]
 
-  @@map("users")
+  @@map("users") // 表名使用复数
 }
 
 model Requirement {
-  id          String   @id @default(cuid())
+  id          String            @id @default(uuid())
   title       String
   description String
-  budget      Float?
+  budget      Decimal?          @db.Decimal(10, 2) // 使用 Decimal 避免精度问题
   deadline    DateTime?
-  status      String   @default("open") // open, in_progress, completed, cancelled
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      RequirementStatus @default(OPEN)
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
 
-  // 关联
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  comments  Comment[]
-  likes     Like[]
-  tags      Tag[]
+  userId      String          @map("user_id")
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments   Comment[]
+  likes      Like[]
+  tags       Tag[]
 
-  @@map("requirements")
+  @@map("requirements") // 表名使用复数
 }
 
 model Comment {
-  id        String   @id @default(cuid())
+  id        String    @id @default(uuid())
   content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
-  // 关联
-  userId         String
-  user           User        @relation(fields: [userId], references: [id])
-  requirementId  String
-  requirement    Requirement @relation(fields: [requirementId], references: [id])
+  userId        String      @map("user_id")
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requirementId String      @map("requirement_id")
+  requirement   Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
 
-  @@map("comments")
+  @@map("comments") // 表名使用复数
 }
 
 model Like {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now()) @map("created_at")
 
-  // 关联
-  userId         String
-  user           User        @relation(fields: [userId], references: [id])
-  requirementId  String
-  requirement    Requirement @relation(fields: [requirementId], references: [id])
+  userId        String      @map("user_id")
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requirementId String      @map("requirement_id")
+  requirement   Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
 
   @@unique([userId, requirementId])
-  @@map("likes")
+  @@map("likes") // 表名使用复数
 }
 
 model Tag {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(uuid())
+  name      String    @unique @db.VarChar(255) // 限制长度
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
-  // 关联
   requirements Requirement[]
 
-  @@map("tags")
-} 
+  @@map("tags") // 表名使用复数
+}

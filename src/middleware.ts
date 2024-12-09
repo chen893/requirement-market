@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
             message: '未登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -48,7 +48,7 @@ export async function middleware(request: NextRequest) {
             message: '登录已过期，请重新登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -89,4 +89,4 @@ export const config = {
      */
     '/((?!api/auth|_next/static|_next/image|favicon.ico).*)',
   ],
-} 
+}

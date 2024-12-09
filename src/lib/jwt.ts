@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from 'jose'
 import { nanoid } from 'nanoid'
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'your-secret-key'
+  process.env.JWT_SECRET || 'your-secret-key',
 )
 
 interface JWTPayload {
@@ -54,4 +54,4 @@ export async function getTokenData(token: string): Promise<JWTPayload | null> {
     console.error('Error getting token data:', error)
     return null
   }
-} 
+}

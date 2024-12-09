@@ -6,7 +6,7 @@ import { validateToken } from '@/lib/jwt'
 // 获取需求详情
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const { id } = params
@@ -33,7 +33,7 @@ export async function GET(
             },
           },
           orderBy: {
-            createdAt: 'desc',
+            created_at: 'desc',
           },
         },
         _count: {
@@ -54,7 +54,7 @@ export async function GET(
             message: '需求不存在',
           },
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -72,7 +72,7 @@ export async function GET(
           message: '获取需求详情失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -80,7 +80,7 @@ export async function GET(
 // 更新需求
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const { id } = params
@@ -96,7 +96,7 @@ export async function PUT(
             message: '未登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -110,7 +110,7 @@ export async function PUT(
             message: '登录已过期，请重新登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -128,12 +128,12 @@ export async function PUT(
             message: '需求不存在',
           },
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
     // 检查是否是需求的创建者
-    if (existingRequirement.userId !== payload.userId) {
+    if (existingRequirement.user_id !== payload.userId) {
       return NextResponse.json(
         {
           success: false,
@@ -142,7 +142,7 @@ export async function PUT(
             message: '无权修改此需求',
           },
         },
-        { status: 403 }
+        { status: 403 },
       )
     }
 
@@ -160,7 +160,7 @@ export async function PUT(
             message: '请填写所有必填字段',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -174,7 +174,7 @@ export async function PUT(
             message: '标题长度必须在 5-100 个字符之间',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -188,7 +188,7 @@ export async function PUT(
             message: '描述长度必须在 20-5000 个字符之间',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -202,7 +202,7 @@ export async function PUT(
             message: '预算必须是大于等于 0 的数字',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -218,7 +218,7 @@ export async function PUT(
               message: '截止日期必须是未来的日期',
             },
           },
-          { status: 400 }
+          { status: 400 },
         )
       }
     }
@@ -234,7 +234,7 @@ export async function PUT(
             message: '无效的状态',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -284,7 +284,7 @@ export async function PUT(
           message: '更新需求失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -292,7 +292,7 @@ export async function PUT(
 // 删除需求
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const { id } = params
@@ -308,7 +308,7 @@ export async function DELETE(
             message: '未登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -322,7 +322,7 @@ export async function DELETE(
             message: '登录已过期，请重新登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -340,12 +340,12 @@ export async function DELETE(
             message: '需求不存在',
           },
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
     // 检查是否是需求的创建者
-    if (existingRequirement.userId !== payload.userId) {
+    if (existingRequirement.user_id !== payload.userId) {
       return NextResponse.json(
         {
           success: false,
@@ -354,7 +354,7 @@ export async function DELETE(
             message: '无权删除此需求',
           },
         },
-        { status: 403 }
+        { status: 403 },
       )
     }
 
@@ -377,7 +377,7 @@ export async function DELETE(
           message: '删除需求失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
-} 
+}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import apiClient from '@/lib/api-client'
 import { formatRelativeTime } from '@/lib/utils'
@@ -24,7 +25,7 @@ interface Requirement {
   budget: number | null
   deadline: string | null
   status: string
-  createdAt: string
+  created_at: string
   user: User
   tags: Tag[]
   _count: {
@@ -72,7 +73,7 @@ export default function HomePage() {
     const fetchLatestRequirements = async () => {
       try {
         const data = await apiClient.get<RequirementListResponse>(
-          '/requirements?page=1&limit=6'
+          '/requirements?page=1&limit=6',
         )
         setRequirements(data.items)
       } catch (err) {
@@ -122,7 +123,6 @@ export default function HomePage() {
 
   return (
     <div className="bg-white">
-
       <div className="relative isolate">
         <div
           className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
@@ -144,7 +144,7 @@ export default function HomePage() {
               <span className="text-blue-600">连接创意与技术</span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-              在这里发布您的项目需求，或者寻找感兴趣的项目。我们致力于连接需求方和开发者，让每个创意都能找到最好的实现者。
+              在这里发布您的项目需求，或者寻找感兴趣的项目。我们致力��连接需求方和开发者，让每个创意都能找到最好的实现者。
             </p>
             <div className="mt-10">
               <form
@@ -156,7 +156,7 @@ export default function HomePage() {
                   className="min-w-0 flex-auto rounded-md border-0 bg-white/5 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6"
                   placeholder="搜索需求，例如：React开发..."
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <button
                   type="submit"
@@ -202,12 +202,14 @@ export default function HomePage() {
       <div className="bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-4">
-            {platformStats.map(stat => (
+            {platformStats.map((stat) => (
               <div
                 key={stat.label}
                 className="mx-auto flex max-w-xs flex-col gap-y-4"
               >
-                <dt className="text-base leading-7 text-gray-600">{stat.label}</dt>
+                <dt className="text-base leading-7 text-gray-600">
+                  {stat.label}
+                </dt>
                 <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
                   {stat.value}
                 </dd>
@@ -224,7 +226,7 @@ export default function HomePage() {
             热门标签
           </h2>
           <div className="mt-6 flex flex-wrap gap-4">
-            {popularTags.map(tag => (
+            {popularTags.map((tag) => (
               <Link
                 key={tag}
                 href={`/requirements?tag=${encodeURIComponent(tag)}`}
@@ -266,7 +268,7 @@ export default function HomePage() {
             <div className="mt-10 text-center text-gray-500">暂无需求</div>
           ) : (
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-              {requirements.map(requirement => (
+              {requirements.map((requirement) => (
                 <div
                   key={requirement.id}
                   className="group relative bg-white rounded-lg shadow-sm ring-1 ring-gray-200 hover:shadow-lg hover:ring-gray-300 transition-all duration-200"
@@ -274,14 +276,14 @@ export default function HomePage() {
                   <div className="p-6">
                     <div className="flex items-center gap-x-4">
                       <time
-                        dateTime={requirement.createdAt}
+                        dateTime={requirement.created_at}
                         className="text-sm text-gray-500"
                       >
-                        {formatRelativeTime(requirement.createdAt)}
+                        {formatRelativeTime(requirement.created_at)}
                       </time>
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
-                          requirement.status
+                          requirement.status,
                         )}`}
                       >
                         {getStatusText(requirement.status)}
@@ -302,21 +304,19 @@ export default function HomePage() {
                       {requirement.description}
                     </p>
                     <div className="mt-6 flex items-center gap-x-4">
-                      {requirement.user.avatar ? (
-                        <img
-                          src={requirement.user.avatar}
+                      <div className="flex items-center space-x-3">
+                        <Image
+                          src={requirement.user.avatar || '/default-avatar.png'}
                           alt={requirement.user.username}
-                          className="h-8 w-8 rounded-full bg-gray-50"
+                          width={40}
+                          height={40}
+                          className="rounded-full"
                         />
-                      ) : (
-                        <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm">
-                          {requirement.user.username[0].toUpperCase()}
+                        <div className="text-sm leading-6">
+                          <p className="font-semibold text-gray-900">
+                            {requirement.user.username}
+                          </p>
                         </div>
-                      )}
-                      <div className="text-sm leading-6">
-                        <p className="font-semibold text-gray-900">
-                          {requirement.user.username}
-                        </p>
                       </div>
                     </div>
                     <div className="mt-4 flex items-center gap-x-4">
@@ -354,7 +354,7 @@ export default function HomePage() {
                       </div>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {requirement.tags.map(tag => (
+                      {requirement.tags.map((tag) => (
                         <span
                           key={tag.id}
                           className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800"
@@ -372,4 +372,4 @@ export default function HomePage() {
       </div>
     </div>
   )
-} 
+}

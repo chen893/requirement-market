@@ -6,7 +6,7 @@ import { validateToken } from '@/lib/jwt'
 // 获取点赞状态
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const { id } = params
@@ -52,7 +52,7 @@ export async function GET(
           message: '获取点赞状态失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -60,7 +60,7 @@ export async function GET(
 // 切换点赞状态
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const { id } = params
@@ -76,7 +76,7 @@ export async function POST(
             message: '未登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -90,7 +90,7 @@ export async function POST(
             message: '登录已过期，请重新登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -108,7 +108,7 @@ export async function POST(
             message: '需求不存在',
           },
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -161,7 +161,7 @@ export async function POST(
           message: '操作失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
-} 
+}

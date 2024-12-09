@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -21,7 +21,6 @@ export function formatRelativeTime(date: string | Date) {
     return '刚刚'
   }
 
-  
   const diffInMinutes = Math.floor(diffInSeconds / 60)
   if (diffInMinutes < 60) {
     return `${diffInMinutes} 分钟前`
@@ -45,7 +44,6 @@ export function formatRelativeTime(date: string | Date) {
   const diffInYears = Math.floor(diffInMonths / 12)
   return `${diffInYears} 年前`
 }
-
 
 // 截断文本
 export function truncateText(text: string, length: number) {
@@ -106,7 +104,7 @@ export function isStrongPassword(password: string): boolean {
 // 获取密码强度提示
 export function getPasswordStrengthHint(password: string): string {
   const hints = []
-  
+
   if (password.length < 8) {
     hints.push('密码长度至少为 8 位')
   }
@@ -129,7 +127,7 @@ export function getPasswordStrengthHint(password: string): string {
 // 防抖函数
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null
 
@@ -149,7 +147,7 @@ export function debounce<T extends (...args: any[]) => any>(
 // 节流函数
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
-  limit: number
+  limit: number,
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean = false
 
@@ -162,4 +160,4 @@ export function throttle<T extends (...args: any[]) => any>(
       }, limit)
     }
   }
-} 
+}

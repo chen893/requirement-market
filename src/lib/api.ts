@@ -35,12 +35,14 @@ api.interceptors.response.use(
       window.location.href = '/auth/login'
     }
     return Promise.reject(error)
-  }
+  },
 )
 
 // 认证相关 API
 export const auth = {
-  async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
+  async login(
+    credentials: LoginCredentials,
+  ): Promise<ApiResponse<AuthResponse>> {
     const response = await api.post('/auth/login', credentials)
     return response.data
   },
@@ -63,7 +65,7 @@ export const auth = {
 // 需求相关 API
 export const requirements = {
   async getAll(
-    filters?: RequirementFilters
+    filters?: RequirementFilters,
   ): Promise<ApiResponse<PaginatedResponse<Requirement>>> {
     const response = await api.get('/requirements', { params: filters })
     return response.data
@@ -81,7 +83,7 @@ export const requirements = {
 
   async update(
     id: string,
-    data: Partial<Requirement>
+    data: Partial<Requirement>,
   ): Promise<ApiResponse<Requirement>> {
     const response = await api.put(`/requirements/${id}`, data)
     return response.data
@@ -117,4 +119,4 @@ export const users = {
   },
 }
 
-export default api 
+export default api

@@ -8,7 +8,7 @@ export async function POST() {
         success: true,
         message: '注销成功',
       },
-      { status: 200 }
+      { status: 200 },
     )
 
     // 删除 token cookie
@@ -25,7 +25,7 @@ export async function POST() {
           message: '注销失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
-} 
+}

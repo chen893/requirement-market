@@ -17,7 +17,13 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
 import apiClient from '@/lib/api-client'
 import type { AIAnalysis } from '@/types'
@@ -25,7 +31,10 @@ import type { AIAnalysis } from '@/types'
 // 定义表单验证模式
 const formSchema = z.object({
   title: z.string().min(5, '标题至少5个字符').max(100, '标题最多100个字符'),
-  description: z.string().min(20, '描述至少20个字符').max(5000, '描述最多5000个字符'),
+  description: z
+    .string()
+    .min(20, '描述至少20个字符')
+    .max(5000, '描述最多5000个字符'),
   budget: z.string().optional(),
   deadline: z.string().optional(),
   tags: z.string(),
@@ -62,10 +71,13 @@ export default function NewRequirementPage() {
     try {
       setAnalyzing(true)
       setError('')
-      const response = await apiClient.post<AIAnalysis>('/requirements/analyze', {
-        title,
-        description,
-      })
+      const response = await apiClient.post<AIAnalysis>(
+        '/requirements/analyze',
+        {
+          title,
+          description,
+        },
+      )
       console.log('response.data', response)
       setAnalysis(response)
     } catch (err) {
@@ -82,7 +94,10 @@ export default function NewRequirementPage() {
         ...values,
         budget: values.budget ? parseFloat(values.budget) : null,
         deadline: values.deadline || null,
-        tags: values.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+        tags: values.tags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
       })
       router.push('/requirements')
     } catch (err) {
@@ -111,9 +126,11 @@ export default function NewRequirementPage() {
               <CardContent className="space-y-4">
                 <div>
                   <h4 className="font-medium mb-2">可行性分析</h4>
-                  <p className="text-sm text-muted-foreground">{analysis.feasibility}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {analysis.feasibility}
+                  </p>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium mb-2">建议技术栈</h4>
                   <ul className="list-disc list-inside text-sm text-muted-foreground">
@@ -125,7 +142,9 @@ export default function NewRequirementPage() {
 
                 <div>
                   <h4 className="font-medium mb-2">预计开发周期</h4>
-                  <p className="text-sm text-muted-foreground">{analysis.timeline}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {analysis.timeline}
+                  </p>
                 </div>
 
                 <div>
@@ -149,9 +168,12 @@ export default function NewRequirementPage() {
                   <div className="text-sm text-destructive">{error}</div>
                 </div>
               )}
-              
+
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   <FormField
                     control={form.control}
                     name="title"
@@ -159,7 +181,10 @@ export default function NewRequirementPage() {
                       <FormItem>
                         <FormLabel>标题</FormLabel>
                         <FormControl>
-                          <Input placeholder="请输入需求标题（5-100字）" {...field} />
+                          <Input
+                            placeholder="请输入需求标题（5-100字）"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -4,7 +4,7 @@ export interface User {
   username: string
   email: string
   avatar?: string
-  createdAt: string
+  created_at: string
   updatedAt: string
 }
 
@@ -18,7 +18,7 @@ export interface Requirement {
   author: User
   status: RequirementStatus
   aiAnalysis?: AIAnalysis
-  createdAt: string
+  created_at: string
   updatedAt: string
 }
 
@@ -38,7 +38,7 @@ export interface AIAnalysis {
   techStack: string[]
   timeline: string
   suggestions: string[]
-  createdAt: string
+  created_at: string
 }
 
 // API 响应类型
@@ -94,4 +94,4 @@ export interface RegisterData extends LoginCredentials {
 export interface AuthResponse {
   user: User
   token: string
-} 
+}

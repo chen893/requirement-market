@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
             message: '未登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
             message: '登录已过期，请重新登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
             message: '用户不存在',
           },
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
           message: '获取用户信息失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
-} 
+}

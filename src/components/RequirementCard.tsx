@@ -5,7 +5,7 @@ interface RequirementCardProps {
   id: string
   title: string
   description: string
-  createdAt: string
+  created_at: string
   tags?: string[]
 }
 
@@ -13,7 +13,7 @@ const RequirementCard: FC<RequirementCardProps> = ({
   id,
   title,
   description,
-  createdAt,
+  created_at,
   tags = [],
 }) => {
   return (
@@ -25,7 +25,7 @@ const RequirementCard: FC<RequirementCardProps> = ({
           </Link>
         </h3>
         <p className="text-gray-600 mb-4 line-clamp-2">{description}</p>
-        
+
         {tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
             {tags.map((tag) => (
@@ -38,9 +38,9 @@ const RequirementCard: FC<RequirementCardProps> = ({
             ))}
           </div>
         )}
-        
+
         <div className="flex justify-between items-center text-sm text-gray-500">
-          <span>{createdAt}</span>
+          <span>{created_at}</span>
           <Link
             href={`/requirements/${id}`}
             className="text-blue-600 hover:text-blue-800 font-medium"
@@ -53,4 +53,4 @@ const RequirementCard: FC<RequirementCardProps> = ({
   )
 }
 
-export default RequirementCard 
+export default RequirementCard

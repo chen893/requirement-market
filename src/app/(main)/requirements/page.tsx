@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import apiClient from '@/lib/api-client'
 import { formatRelativeTime } from '@/lib/utils'
 
@@ -24,7 +25,7 @@ interface Requirement {
   budget: number | null
   deadline: string | null
   status: string
-  createdAt: string
+  created_at: string
   user: User
   tags: Tag[]
   _count: {
@@ -88,45 +89,45 @@ export default function RequirementsPage() {
     sort: searchParams?.get('sort') || 'latest',
   })
 
-  const fetchRequirements = async (pageNum: number, isNewSearch = false) => {
-    try {
-      setLoading(true)
-      const queryParams = new URLSearchParams({
-        page: pageNum.toString(),
-        limit: '9',
-        ...(filters.status && { status: filters.status }),
-        ...(filters.tag && { tag: filters.tag }),
-        ...(filters.search && { search: filters.search }),
-        ...(filters.sort && { sort: filters.sort }),
-      })
+  const fetchRequirements = useCallback(
+    async (pageNum: number, isNewSearch = false) => {
+      try {
+        setLoading(true)
+        const queryParams = new URLSearchParams({
+          page: pageNum.toString(),
+          limit: '9',
+          ...(filters.status && { status: filters.status }),
+          ...(filters.tag && { tag: filters.tag }),
+          ...(filters.search && { search: filters.search }),
+          ...(filters.sort && { sort: filters.sort }),
+        })
 
-      const data = await apiClient.get<RequirementListResponse>(
-        `/requirements?${queryParams}`
-      )
+        const data = await apiClient.get<RequirementListResponse>(
+          `/requirements?${queryParams}`,
+        )
 
-      if (isNewSearch) {
-        setRequirements(data.items)
-      } else {
-        setRequirements(prev => [...prev, ...data.items])
+        if (isNewSearch) {
+          setRequirements(data.items)
+        } else {
+          setRequirements((prev) => [...prev, ...data.items])
+        }
+        setHasMore(pageNum < data.totalPages)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '获取需求列表失败')
+      } finally {
+        setLoading(false)
       }
-      setHasMore(pageNum < data.totalPages)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '获取需求列表失败')
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    [filters],
+  )
 
   useEffect(() => {
     setPage(1)
     fetchRequirements(1, true)
-  }, [filters])
+  }, [filters, fetchRequirements])
 
-  const handleFilterChange = (
-    key: keyof typeof filters,
-    value: string
-  ) => {
-    setFilters(prev => ({ ...prev, [key]: value }))
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }))
     // 更新 URL 参数
     const newParams = new URLSearchParams(searchParams?.toString() || '')
     if (value) {
@@ -139,7 +140,7 @@ export default function RequirementsPage() {
 
   const loadMore = () => {
     if (!loading && hasMore) {
-      setPage(prev => prev + 1)
+      setPage((prev) => prev + 1)
       fetchRequirements(page + 1)
     }
   }
@@ -221,16 +222,16 @@ export default function RequirementsPage() {
                   className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                   placeholder="搜索需求..."
                   value={filters.search}
-                  onChange={e => handleFilterChange('search', e.target.value)}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
                 />
               </div>
             </div>
             <select
               value={filters.status}
-              onChange={e => handleFilterChange('status', e.target.value)}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
               className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
             >
-              {statusOptions.map(option => (
+              {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -238,10 +239,10 @@ export default function RequirementsPage() {
             </select>
             <select
               value={filters.sort}
-              onChange={e => handleFilterChange('sort', e.target.value)}
+              onChange={(e) => handleFilterChange('sort', e.target.value)}
               className="rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
             >
-              {sortOptions.map(option => (
+              {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -258,11 +259,7 @@ export default function RequirementsPage() {
                   : 'text-gray-400 hover:text-gray-500'
               } rounded-md`}
             >
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M4.25 2A2.25 2.25 0 002 4.25v2.5A2.25 2.25 0 004.25 9h2.5A2.25 2.25 0 009 6.75v-2.5A2.25 2.25 0 006.75 2h-2.5zm0 9A2.25 2.25 0 002 13.25v2.5A2.25 2.25 0 004.25 18h2.5A2.25 2.25 0 009 15.75v-2.5A2.25 2.25 0 006.75 11h-2.5zm9-9A2.25 2.25 0 0011 4.25v2.5A2.25 2.25 0 0013.25 9h2.5A2.25 2.25 0 0018 6.75v-2.5A2.25 2.25 0 0015.75 2h-2.5zm0 9A2.25 2.25 0 0011 13.25v2.5A2.25 2.25 0 0013.25 18h2.5A2.25 2.25 0 0018 15.75v-2.5A2.25 2.25 0 0015.75 11h-2.5z"
@@ -279,11 +276,7 @@ export default function RequirementsPage() {
                   : 'text-gray-400 hover:text-gray-500'
               } rounded-md`}
             >
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
@@ -297,10 +290,12 @@ export default function RequirementsPage() {
         {/* 热门标签 */}
         <div className="mt-4">
           <div className="flex flex-wrap gap-2">
-            {popularTags.map(tag => (
+            {popularTags.map((tag) => (
               <button
                 key={tag}
-                onClick={() => handleFilterChange('tag', tag === '全部' ? '' : tag)}
+                onClick={() =>
+                  handleFilterChange('tag', tag === '全部' ? '' : tag)
+                }
                 className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
                   (tag === '全部' && !filters.tag) || filters.tag === tag
                     ? 'bg-blue-100 text-blue-700'
@@ -385,27 +380,13 @@ export default function RequirementsPage() {
                 <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      {requirement.user.avatar ? (
-                        <img
-                          src={requirement.user.avatar}
-                          alt={requirement.user.username}
-                          className="h-10 w-10 rounded-full cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            router.push(`/users/${requirement.user.id}`)
-                          }}
-                        />
-                      ) : (
-                        <div
-                          className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            router.push(`/users/${requirement.user.id}`)
-                          }}
-                        >
-                          {requirement.user.username[0].toUpperCase()}
-                        </div>
-                      )}
+                      <Image
+                        src={requirement.user.avatar || '/default-avatar.png'}
+                        alt={requirement.user.username}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
                       <div>
                         <p
                           className="text-sm font-medium text-gray-900 hover:text-blue-600 cursor-pointer"
@@ -417,14 +398,14 @@ export default function RequirementsPage() {
                           {requirement.user.username}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {formatRelativeTime(requirement.createdAt)}
+                          {formatRelativeTime(requirement.created_at)}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
-                          requirement.status
+                          requirement.status,
                         )}`}
                       >
                         {getStatusText(requirement.status)}
@@ -514,4 +495,4 @@ export default function RequirementsPage() {
       </div>
     </div>
   )
-} 
+}

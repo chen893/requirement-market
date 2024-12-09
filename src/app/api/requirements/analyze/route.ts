@@ -6,10 +6,7 @@ export async function POST(request: Request) {
     const { title, description } = await request.json()
 
     if (!title || !description) {
-      return NextResponse.json(
-        { error: '标题和描述是必需的' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: '标题和描述是必需的' }, { status: 400 })
     }
 
     const analysis = await analyzeRequirement(title, description)
@@ -20,9 +17,6 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('AI analysis error:', error)
-    return NextResponse.json(
-      { error: '分析失败，请稍后重试' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: '分析失败，请稍后重试' }, { status: 500 })
   }
 }

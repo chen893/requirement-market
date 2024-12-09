@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma'
 // 获取相关需求
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const { id } = params
@@ -27,7 +27,7 @@ export async function GET(
             message: '需求不存在',
           },
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -38,7 +38,7 @@ export async function GET(
         tags: {
           some: {
             id: {
-              in: currentRequirement.tags.map(tag => tag.id),
+              in: currentRequirement.tags.map((tag) => tag.id),
             },
           },
         },
@@ -69,7 +69,7 @@ export async function GET(
           message: '获取相关需求失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
-} 
+}

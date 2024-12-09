@@ -44,10 +44,7 @@ class ApiClient {
     return data.data as T
   }
 
-  async fetch<T>(
-    endpoint: string,
-    options: FetchOptions = {}
-  ): Promise<T> {
+  async fetch<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
     const url = this.baseUrl + endpoint
     const token = this.getToken()
     const requireAuth = options.requireAuth ?? this.defaultOptions.requireAuth
@@ -106,4 +103,4 @@ class ApiClient {
 // 创建一个单例实例
 const apiClient = new ApiClient('/api')
 
-export default apiClient 
+export default apiClient

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { type NextRequest } from 'next/server'
+import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { validateToken } from '@/lib/jwt'
 
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
             message: '未登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
             message: '登录已过期，请重新登录',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
             message: '请填写所有必填字段',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
             message: '标题长度必须在 5-100 个字符之间',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
             message: '描述长度必须在 20-5000 个字符之间',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
             message: '预算必须是大于等于 0 的数字',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -104,10 +105,10 @@ export async function POST(request: NextRequest) {
             success: false,
             error: {
               code: 'INVALID_DEADLINE',
-              message: '截止日期必须是未来的日期',
+              message: '截止日期必须是未来的���期',
             },
           },
-          { status: 400 }
+          { status: 400 },
         )
       }
     }
@@ -120,15 +121,16 @@ export async function POST(request: NextRequest) {
         budget: budget ? parseFloat(budget) : null,
         deadline: deadline ? new Date(deadline) : null,
         userId: payload.userId,
-        // 如果提供了标签，创建或关联标签
-        tags: tags
-          ? {
-              connectOrCreate: tags.map((tag: string) => ({
-                where: { name: tag },
-                create: { name: tag },
-              })),
-            }
-          : undefined,
+        // 修改标签处理逻辑
+        tags:
+          tags && tags.length > 0
+            ? {
+                connectOrCreate: tags.map((tagName: string) => ({
+                  where: { name: tagName },
+                  create: { name: tagName },
+                })),
+              }
+            : undefined,
       },
       include: {
         user: {
@@ -156,7 +158,7 @@ export async function POST(request: NextRequest) {
           message: '创建需求失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -172,9 +174,11 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')
 
     // 构建查询条件
-    const where: any = {}
+    const where: Prisma.RequirementWhereInput = {}
     if (status) {
-      where.status = status
+      where: {
+        status
+      }
     }
     if (tag) {
       where.tags = {
@@ -229,10 +233,19 @@ export async function GET(request: NextRequest) {
       take: limit,
     })
 
+    // 处理返回数据，将 tags 数组格式化
+    const formattedRequirements = requirements.map((requirement) => {
+      const { tags, ...rest } = requirement
+      return {
+        ...rest,
+        tags: tags.map((tag) => tag.name),
+      }
+    })
+
     return NextResponse.json({
       success: true,
       data: {
-        items: requirements,
+        items: formattedRequirements,
         total,
         page,
         limit,
@@ -249,7 +262,7 @@ export async function GET(request: NextRequest) {
           message: '获取需求列表失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
-} 
+}

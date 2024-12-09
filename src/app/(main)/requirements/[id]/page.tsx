@@ -1,25 +1,25 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatRelativeTime } from '@/lib/utils'
 import apiClient from '@/lib/api-client'
-import toast, {  Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 
 interface User {
   id: string
   username: string
   avatar?: string
   bio?: string
-  createdAt: string
+  created_at: string
 }
 
 interface Comment {
   id: string
   content: string
-  createdAt: string
+  created_at: string
   user: User
 }
 
@@ -35,7 +35,7 @@ interface Requirement {
   budget: number | null
   deadline: string | null
   status: string
-  createdAt: string
+  created_at: string
   updatedAt: string
   user: User
   tags: Tag[]
@@ -58,12 +58,13 @@ interface RelatedRequirement {
 }
 
 export default function RequirementDetailPage() {
-  const router = useRouter()
   const params = useParams()
   const id = params?.id as string
   const [requirement, setRequirement] = useState<Requirement | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
-  const [relatedRequirements, setRelatedRequirements] = useState<RelatedRequirement[]>([])
+  const [relatedRequirements, setRelatedRequirements] = useState<
+    RelatedRequirement[]
+  >([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [commentContent, setCommentContent] = useState('')
@@ -78,22 +79,22 @@ export default function RequirementDetailPage() {
         setError('')
         const data = await apiClient.get<Requirement>(`/requirements/${id}`)
         setRequirement(data)
-        
+
         // // 获取相关需求
         const relatedData = await apiClient.get<RelatedRequirement[]>(
-          `/requirements/${id}/related`
+          `/requirements/${id}/related`,
         )
         setRelatedRequirements(relatedData)
-        
+
         // 获取评论列表
         const commentsData = await apiClient.get<Comment[]>(
-          `/requirements/${id}/comments`
+          `/requirements/${id}/comments`,
         )
         setComments(commentsData)
-        
+
         // 获取点赞状态
-        const likeStatus = await apiClient.get<{liked: boolean}>(
-          `/requirements/${id}/like-status`
+        const likeStatus = await apiClient.get<{ liked: boolean }>(
+          `/requirements/${id}/like-status`,
         )
         setLiked(likeStatus.liked)
       } catch (err) {
@@ -115,10 +116,13 @@ export default function RequirementDetailPage() {
 
     try {
       setSubmittingComment(true)
-      const newComment = await apiClient.post<Comment>(`/requirements/${id}/comments`, {
-        content: commentContent
-      })
-      setComments(prev => [newComment, ...prev])
+      const newComment = await apiClient.post<Comment>(
+        `/requirements/${id}/comments`,
+        {
+          content: commentContent,
+        },
+      )
+      setComments((prev) => [newComment, ...prev])
       setCommentContent('')
       toast.success('评论发布成功')
     } catch (err) {
@@ -130,18 +134,22 @@ export default function RequirementDetailPage() {
 
   const handleToggleLike = async () => {
     try {
-      const response = await apiClient.post<{liked: boolean}>(
-        `/requirements/${id}/toggle-like`
+      const response = await apiClient.post<{ liked: boolean }>(
+        `/requirements/${id}/toggle-like`,
       )
       setLiked(response.liked)
       if (requirement) {
-        setRequirement(prev => prev ? {
-          ...prev,
-          _count: {
-            ...prev._count,
-            likes: prev._count.likes + (response.liked ? 1 : -1)
-          }
-        } : null)
+        setRequirement((prev) =>
+          prev
+            ? {
+                ...prev,
+                _count: {
+                  ...prev._count,
+                  likes: prev._count.likes + (response.liked ? 1 : -1),
+                },
+              }
+            : null,
+        )
       }
       toast.success(response.liked ? '已添加到收藏' : '已取消收藏')
     } catch (err) {
@@ -225,8 +233,6 @@ export default function RequirementDetailPage() {
   return (
     <div className="bg-gray-50 py-8 min-h-[calc(100vh-10)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
-
         <div className="lg:flex lg:items-start lg:space-x-8">
           {/* 主要内容 */}
           <div className="flex-1">
@@ -240,11 +246,11 @@ export default function RequirementDetailPage() {
                     </h1>
                     <div className="mt-2 flex items-center space-x-4">
                       <span className="text-sm text-gray-500">
-                        发布于 {formatRelativeTime(requirement.createdAt)}
+                        发布于 {formatRelativeTime(requirement.created_at)}
                       </span>
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
-                          requirement.status
+                          requirement.status,
                         )}`}
                       >
                         {getStatusText(requirement.status)}
@@ -310,7 +316,7 @@ export default function RequirementDetailPage() {
 
                 {/* 标签 */}
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {requirement.tags.map(tag => (
+                  {requirement.tags.map((tag) => (
                     <Link
                       key={tag.id}
                       href={`/requirements?tag=${encodeURIComponent(tag.name)}`}
@@ -323,52 +329,57 @@ export default function RequirementDetailPage() {
 
                 {/* 详细描述 */}
                 <div className="prose prose-blue mt-8 max-w-none">
-                  <div className="whitespace-pre-wrap">{requirement.description}</div>
+                  <div className="whitespace-pre-wrap">
+                    {requirement.description}
+                  </div>
                 </div>
 
                 {/* 附件 */}
-                {requirement.attachments && requirement.attachments.length > 0 && (
-                  <div className="mt-8">
-                    <h3 className="text-lg font-medium text-gray-900">附件</h3>
-                    <ul className="mt-4 divide-y divide-gray-200 rounded-md border border-gray-200">
-                      {requirement.attachments.map(attachment => (
-                        <li
-                          key={attachment.id}
-                          className="flex items-center justify-between py-3 pl-3 pr-4 text-sm"
-                        >
-                          <div className="flex w-0 flex-1 items-center">
-                            <svg
-                              className="h-5 w-5 flex-shrink-0 text-gray-400"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                              />
-                            </svg>
-                            <span className="ml-2 w-0 flex-1 truncate">
-                              {attachment.filename}
-                            </span>
-                          </div>
-                          <div className="ml-4 flex-shrink-0">
-                            <a
-                              href={attachment.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium text-blue-600 hover:text-blue-500"
-                            >
-                              下载
-                            </a>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                {requirement.attachments &&
+                  requirement.attachments.length > 0 && (
+                    <div className="mt-8">
+                      <h3 className="text-lg font-medium text-gray-900">
+                        附件
+                      </h3>
+                      <ul className="mt-4 divide-y divide-gray-200 rounded-md border border-gray-200">
+                        {requirement.attachments.map((attachment) => (
+                          <li
+                            key={attachment.id}
+                            className="flex items-center justify-between py-3 pl-3 pr-4 text-sm"
+                          >
+                            <div className="flex w-0 flex-1 items-center">
+                              <svg
+                                className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                                />
+                              </svg>
+                              <span className="ml-2 w-0 flex-1 truncate">
+                                {attachment.filename}
+                              </span>
+                            </div>
+                            <div className="ml-4 flex-shrink-0">
+                              <a
+                                href={attachment.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-medium text-blue-600 hover:text-blue-500"
+                              >
+                                下载
+                              </a>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
               </div>
             </div>
 
@@ -379,7 +390,7 @@ export default function RequirementDetailPage() {
                   <h2 className="text-lg font-medium text-gray-900">
                     评论 ({requirement._count.comments})
                   </h2>
-                  
+
                   {/* 评论输入框 */}
                   <form onSubmit={handleSubmitComment} className="mt-4">
                     <div>
@@ -393,7 +404,7 @@ export default function RequirementDetailPage() {
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                         placeholder="写下你的评论..."
                         value={commentContent}
-                        onChange={e => setCommentContent(e.target.value)}
+                        onChange={(e) => setCommentContent(e.target.value)}
                       />
                     </div>
                     <div className="mt-3 flex items-center justify-end">
@@ -445,19 +456,15 @@ export default function RequirementDetailPage() {
                               />
                             ) : null}
                             <div className="relative flex items-start space-x-3">
-                              {comment.user.avatar ? (
-                                <img
-                                  className="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white"
-                                  src={comment.user.avatar}
-                                  alt={comment.user.username}
-                                />
-                              ) : (
-                                <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                                  <span className="text-lg font-medium text-white">
-                                    {comment.user.username[0].toUpperCase()}
-                                  </span>
-                                </div>
-                              )}
+                              <Image
+                                src={
+                                  comment.user.avatar || '/default-avatar.png'
+                                }
+                                alt={comment.user.username}
+                                width={40}
+                                height={40}
+                                className="rounded-full"
+                              />
                               <div className="min-w-0 flex-1">
                                 <div>
                                   <div className="text-sm">
@@ -469,7 +476,7 @@ export default function RequirementDetailPage() {
                                     </a>
                                   </div>
                                   <p className="mt-0.5 text-sm text-gray-500">
-                                    {formatRelativeTime(comment.createdAt)}
+                                    {formatRelativeTime(comment.created_at)}
                                   </p>
                                 </div>
                                 <div className="mt-2 text-sm text-gray-700">
@@ -493,25 +500,19 @@ export default function RequirementDetailPage() {
             <div className="bg-white shadow sm:rounded-lg">
               <div className="px-4 py-5 sm:p-6">
                 <div className="flex items-center space-x-4">
-                  {requirement.user.avatar ? (
-                    <img
-                      src={requirement.user.avatar}
-                      alt={requirement.user.username}
-                      className="h-12 w-12 rounded-full"
-                    />
-                  ) : (
-                    <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center">
-                      <span className="text-lg font-medium text-white">
-                        {requirement.user.username[0].toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                  <Image
+                    src={requirement.user.avatar || '/default-avatar.png'}
+                    alt={requirement.user.username}
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
                   <div>
                     <h3 className="text-lg font-medium text-gray-900">
                       {requirement.user.username}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      加入于 {formatRelativeTime(requirement.user.createdAt)}
+                      加入于 {formatRelativeTime(requirement.user.created_at)}
                     </p>
                   </div>
                 </div>
@@ -535,10 +536,12 @@ export default function RequirementDetailPage() {
             {relatedRequirements.length > 0 && (
               <div className="mt-8 bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
-                  <h3 className="text-lg font-medium text-gray-900">相关需求</h3>
+                  <h3 className="text-lg font-medium text-gray-900">
+                    相关需求
+                  </h3>
                   <div className="mt-6 flow-root">
                     <ul className="-my-5 divide-y divide-gray-200">
-                      {relatedRequirements.map(related => (
+                      {relatedRequirements.map((related) => (
                         <li key={related.id} className="py-5">
                           <div className="relative focus-within:ring-2 focus-within:ring-blue-500">
                             <h3 className="text-sm font-semibold text-gray-800">
@@ -546,14 +549,17 @@ export default function RequirementDetailPage() {
                                 href={`/requirements/${related.id}`}
                                 className="hover:underline focus:outline-none"
                               >
-                                <span className="absolute inset-0" aria-hidden="true" />
+                                <span
+                                  className="absolute inset-0"
+                                  aria-hidden="true"
+                                />
                                 {related.title}
                               </Link>
                             </h3>
                             <div className="mt-1 flex items-center space-x-2">
                               <span
                                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
-                                  related.status
+                                  related.status,
                                 )}`}
                               >
                                 {getStatusText(related.status)}
@@ -578,4 +584,4 @@ export default function RequirementDetailPage() {
       <Toaster />
     </div>
   )
-} 
+}

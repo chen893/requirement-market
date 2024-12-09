@@ -18,7 +18,7 @@ export async function POST(request: Request) {
             message: '请填写所有必填字段',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
             message: '邮箱格式不正确',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
             message: '用户名长度必须在 2-20 个字符之间',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -60,63 +60,67 @@ export async function POST(request: Request) {
             message: '密码长度不能少于 6 个字符',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
-    // 检查邮箱是否已被注册
-    const existingUserByEmail = await prisma.user.findUnique({
-      where: { email },
-    })
+    console.log('prisma.user.', prisma.user.findUnique)
+    const user = await prisma.$transaction(async (tx) => {
+      // 检查邮箱是否已被注册
+      const existingUserByEmail = await tx.user.findUnique({
+        where: { email },
+      })
 
-    if (existingUserByEmail) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'EMAIL_EXISTS',
-            message: '该邮箱已被注册',
+      if (existingUserByEmail) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'EMAIL_EXISTS',
+              message: '该邮箱已被注册',
+            },
           },
-        },
-        { status: 400 }
-      )
-    }
+          { status: 400 },
+        )
+      }
 
-    // 检查用户名是否已被使用
-    const existingUserByUsername = await prisma.user.findUnique({
-      where: { username },
-    })
+      // 检查用户名是否已被使用
+      const existingUserByUsername = await tx.user.findUnique({
+        where: { username },
+      })
 
-    if (existingUserByUsername) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'USERNAME_EXISTS',
-            message: '该用户名已被使用',
+      if (existingUserByUsername) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'USERNAME_EXISTS',
+              message: '该用户名已被使用',
+            },
           },
+          { status: 400 },
+        )
+      }
+
+      // 加密密码
+      const hashedPassword = await hashPassword(password)
+
+      // 创建用户
+      const user = await tx.user.create({
+        data: {
+          username,
+          email,
+          password: hashedPassword,
         },
-        { status: 400 }
-      )
-    }
-
-    // 加密密码
-    const hashedPassword = await hashPassword(password)
-
-    // 创建用户
-    const user = await prisma.user.create({
-      data: {
-        username,
-        email,
-        password: hashedPassword,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        avatar: true,
-        createdAt: true,
-      },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          avatar: true,
+          createdAt: true,
+        },
+      })
+      return user
     })
 
     return NextResponse.json({
@@ -133,7 +137,7 @@ export async function POST(request: Request) {
           message: '注册失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
-} 
+}

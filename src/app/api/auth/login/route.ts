@@ -19,7 +19,7 @@ export async function POST(request: Request) {
             message: '请填写所有必填字段',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
             message: '邮箱格式不正确',
           },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
             message: '用户不存在',
           },
         },
-        { status: 404 }
+        { status: 404 },
       )
     }
 
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
             message: '密码错误',
           },
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -76,21 +76,19 @@ export async function POST(request: Request) {
     console.log('Generated token:', token) // 添加日志
 
     // 返回用户信息和 token
-    const response = NextResponse.json(
-      {
-        success: true,
-        data: {
-          user: {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            avatar: user.avatar,
-            createdAt: user.createdAt,
-          },
-          token,
+    const response = NextResponse.json({
+      success: true,
+      data: {
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+          createdAt: user.createdAt,
         },
-      }
-    )
+        token,
+      },
+    })
 
     // 设置 cookie
     response.cookies.set({
@@ -114,7 +112,7 @@ export async function POST(request: Request) {
           message: '登录失败，请稍后重试',
         },
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
-} 
+}
