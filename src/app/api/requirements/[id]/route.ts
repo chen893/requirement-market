@@ -19,6 +19,7 @@ export async function GET(
             id: true,
             username: true,
             avatar: true,
+            createdAt: true,
           },
         },
         tags: true,

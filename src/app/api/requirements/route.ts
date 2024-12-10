@@ -214,6 +214,7 @@ export async function GET(request: NextRequest) {
             id: true,
             username: true,
             avatar: true,
+            createdAt: true,
           },
         },
         tags: true,

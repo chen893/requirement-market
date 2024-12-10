@@ -4,11 +4,14 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/auth'
+import type { LoginCredentials } from '@/types'
 
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<
+    LoginCredentials & { remember: boolean }
+  >({
     email: '',
     password: '',
     remember: false,

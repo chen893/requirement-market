@@ -40,13 +40,15 @@ const formSchema = z.object({
   tags: z.string(),
 })
 
+type FormData = z.infer<typeof formSchema>
+
 export default function NewRequirementPage() {
   const router = useRouter()
   const [error, setError] = useState('')
   const [analysis, setAnalysis] = useState<AIAnalysis | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
@@ -87,7 +89,7 @@ export default function NewRequirementPage() {
     }
   }
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormData) {
     try {
       setError('')
       await apiClient.post('/requirements', {

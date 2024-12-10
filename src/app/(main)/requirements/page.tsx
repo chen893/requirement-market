@@ -6,41 +6,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import apiClient from '@/lib/api-client'
 import { formatRelativeTime } from '@/lib/utils'
-
-interface User {
-  id: string
-  username: string
-  avatar?: string
-}
-
-interface Tag {
-  id: string
-  name: string
-}
-
-interface Requirement {
-  id: string
-  title: string
-  description: string
-  budget: number | null
-  deadline: string | null
-  status: string
-  created_at: string
-  user: User
-  tags: Tag[]
-  _count: {
-    comments: number
-    likes: number
-  }
-}
-
-interface RequirementListResponse {
-  items: Requirement[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
-}
+import type { Requirement, PaginatedResponse } from '@/types'
+import toast from 'react-hot-toast'
 
 // 状态选项
 const statusOptions = [
@@ -76,7 +43,9 @@ const popularTags = [
 export default function RequirementsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [requirements, setRequirements] = useState<Requirement[]>([])
+  const [requirements, setRequirements] = useState<
+    (Requirement & { isLiked?: boolean })[]
+  >([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [page, setPage] = useState(1)
@@ -88,6 +57,38 @@ export default function RequirementsPage() {
     search: searchParams?.get('search') || '',
     sort: searchParams?.get('sort') || 'latest',
   })
+
+  // 获取收藏状态
+  const fetchLikeStatuses = async (items: Requirement[]) => {
+    try {
+      const likeStatuses = await Promise.all(
+        items.map(async (requirement) => {
+          try {
+            const response = await apiClient.get<{ liked: boolean }>(
+              `/requirements/${requirement.id}/like-status`,
+            )
+            return { id: requirement.id, isLiked: response.liked }
+          } catch (error) {
+            console.error(
+              `Error fetching like status for ${requirement.id}:`,
+              error,
+            )
+            return { id: requirement.id, isLiked: false }
+          }
+        }),
+      )
+
+      return items.map((requirement) => ({
+        ...requirement,
+        isLiked:
+          likeStatuses.find((status) => status.id === requirement.id)
+            ?.isLiked || false,
+      }))
+    } catch (error) {
+      console.error('Error fetching like statuses:', error)
+      return items.map((requirement) => ({ ...requirement, isLiked: false }))
+    }
+  }
 
   const fetchRequirements = useCallback(
     async (pageNum: number, isNewSearch = false) => {
@@ -102,14 +103,17 @@ export default function RequirementsPage() {
           ...(filters.sort && { sort: filters.sort }),
         })
 
-        const data = await apiClient.get<RequirementListResponse>(
+        const data = await apiClient.get<PaginatedResponse<Requirement>>(
           `/requirements?${queryParams}`,
         )
 
+        // 获取收藏状态
+        const requirementsWithLikeStatus = await fetchLikeStatuses(data.items)
+
         if (isNewSearch) {
-          setRequirements(data.items)
+          setRequirements(requirementsWithLikeStatus)
         } else {
-          setRequirements((prev) => [...prev, ...data.items])
+          setRequirements((prev) => [...prev, ...requirementsWithLikeStatus])
         }
         setHasMore(pageNum < data.totalPages)
       } catch (err) {
@@ -120,6 +124,35 @@ export default function RequirementsPage() {
     },
     [filters],
   )
+
+  // 处理收藏/取消收藏
+  const handleToggleLike = async (requirementId: string) => {
+    try {
+      const response = await apiClient.post<{ liked: boolean }>(
+        `/requirements/${requirementId}/like-status`,
+      )
+
+      setRequirements((prevRequirements) =>
+        prevRequirements.map((req) =>
+          req.id === requirementId
+            ? {
+                ...req,
+                isLiked: response.liked,
+                _count: {
+                  // ...req._count,
+                  comments: req._count?.comments || 0,
+                  likes: (req._count?.likes || 0) + (response.liked ? 1 : -1),
+                },
+              }
+            : req,
+        ),
+      )
+
+      toast.success(response.liked ? '已添加到收藏' : '已取消收藏')
+    } catch (error) {
+      toast.error('操作失败，请稍后重试')
+    }
+  }
 
   useEffect(() => {
     setPage(1)
@@ -398,7 +431,7 @@ export default function RequirementsPage() {
                           {requirement.user.username}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {formatRelativeTime(requirement.created_at)}
+                          {formatRelativeTime(requirement.createdAt)}
                         </p>
                       </div>
                     </div>
@@ -441,23 +474,36 @@ export default function RequirementsPage() {
                             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                           />
                         </svg>
-                        {requirement._count.comments}
+                        {requirement._count?.comments || 0}
                       </div>
                       <div className="flex items-center text-sm text-gray-500">
-                        <svg
-                          className="mr-1.5 h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleToggleLike(requirement.id)
+                          }}
+                          className={`inline-flex items-center text-sm ${
+                            requirement.isLiked
+                              ? 'text-pink-500'
+                              : 'text-gray-500 hover:text-gray-700'
+                          }`}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                          />
-                        </svg>
-                        {requirement._count.likes}
+                          <svg
+                            className="mr-1.5 h-5 w-5"
+                            fill={requirement.isLiked ? 'currentColor' : 'none'}
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                            />
+                          </svg>
+                          {requirement._count?.likes || 0}
+                        </button>
                       </div>
                     </div>
                   </div>

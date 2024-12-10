@@ -4,15 +4,16 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/auth'
+import type { RegisterData } from '@/types'
 
 export default function RegisterPage() {
   const router = useRouter()
   const { register } = useAuth()
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterData>({
     username: '',
     email: '',
     password: '',
-    password_confirmation: '',
+    passwordConfirmation: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -31,7 +32,7 @@ export default function RegisterPage() {
     setLoading(true)
 
     // 验证密码匹配
-    if (formData.password !== formData.password_confirmation) {
+    if (formData.password !== formData.passwordConfirmation) {
       setError('两次输入的密码不一致')
       setLoading(false)
       return
@@ -127,13 +128,13 @@ export default function RegisterPage() {
               </label>
               <input
                 id="password-confirm"
-                name="password_confirmation"
+                name="passwordConfirmation"
                 type="password"
                 autoComplete="new-password"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="确认密码"
-                value={formData.password_confirmation}
+                value={formData.passwordConfirmation}
                 onChange={handleChange}
                 disabled={loading}
               />

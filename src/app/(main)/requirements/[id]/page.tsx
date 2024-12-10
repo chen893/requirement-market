@@ -7,48 +7,7 @@ import Image from 'next/image'
 import { formatRelativeTime } from '@/lib/utils'
 import apiClient from '@/lib/api-client'
 import toast, { Toaster } from 'react-hot-toast'
-
-interface User {
-  id: string
-  username: string
-  avatar?: string
-  bio?: string
-  created_at: string
-}
-
-interface Comment {
-  id: string
-  content: string
-  created_at: string
-  user: User
-}
-
-interface Tag {
-  id: string
-  name: string
-}
-
-interface Requirement {
-  id: string
-  title: string
-  description: string
-  budget: number | null
-  deadline: string | null
-  status: string
-  created_at: string
-  updatedAt: string
-  user: User
-  tags: Tag[]
-  attachments: {
-    id: string
-    filename: string
-    url: string
-  }[]
-  _count: {
-    comments: number
-    likes: number
-  }
-}
+import type { Requirement, Comment } from '@/types'
 
 interface RelatedRequirement {
   id: string
@@ -135,7 +94,7 @@ export default function RequirementDetailPage() {
   const handleToggleLike = async () => {
     try {
       const response = await apiClient.post<{ liked: boolean }>(
-        `/requirements/${id}/toggle-like`,
+        `/requirements/${id}/like-status`,
       )
       setLiked(response.liked)
       if (requirement) {
@@ -144,8 +103,8 @@ export default function RequirementDetailPage() {
             ? {
                 ...prev,
                 _count: {
-                  ...prev._count,
-                  likes: prev._count.likes + (response.liked ? 1 : -1),
+                  likes: (prev._count?.likes || 0) + (response.liked ? 1 : -1),
+                  comments: prev._count?.comments || 0,
                 },
               }
             : null,
@@ -246,7 +205,7 @@ export default function RequirementDetailPage() {
                     </h1>
                     <div className="mt-2 flex items-center space-x-4">
                       <span className="text-sm text-gray-500">
-                        发布于 {formatRelativeTime(requirement.created_at)}
+                        发布于 {formatRelativeTime(requirement.createdAt)}
                       </span>
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
@@ -388,7 +347,7 @@ export default function RequirementDetailPage() {
               <div className="bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <h2 className="text-lg font-medium text-gray-900">
-                    评论 ({requirement._count.comments})
+                    评论 ({requirement._count?.comments || 0})
                   </h2>
 
                   {/* 评论输入框 */}
@@ -476,7 +435,7 @@ export default function RequirementDetailPage() {
                                     </a>
                                   </div>
                                   <p className="mt-0.5 text-sm text-gray-500">
-                                    {formatRelativeTime(comment.created_at)}
+                                    {formatRelativeTime(comment.createdAt)}
                                   </p>
                                 </div>
                                 <div className="mt-2 text-sm text-gray-700">
@@ -512,15 +471,15 @@ export default function RequirementDetailPage() {
                       {requirement.user.username}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      加入于 {formatRelativeTime(requirement.user.created_at)}
+                      加入于 {formatRelativeTime(requirement.user.createdAt)}
                     </p>
                   </div>
                 </div>
-                {requirement.user.bio && (
+                {/* {requirement.user.bio && (
                   <p className="mt-4 text-sm text-gray-500">
                     {requirement.user.bio}
                   </p>
-                )}
+                )} */}
                 <div className="mt-6">
                   <Link
                     href={`/users/${requirement.user.id}`}

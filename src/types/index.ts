@@ -1,97 +1,14 @@
-// 用户相关类型
-export interface User {
-  id: string
-  username: string
-  email: string
-  avatar?: string
-  created_at: string
-  updatedAt: string
-}
+// 导出认证相关类型
+export * from './auth'
 
-// 需求相关类型
-export interface Requirement {
-  id: string
-  title: string
-  description: string
-  category: string
-  tags: string[]
-  author: User
-  status: RequirementStatus
-  aiAnalysis?: AIAnalysis
-  created_at: string
-  updatedAt: string
-}
+// 导出用户相关类型
+export * from './user'
 
-export enum RequirementStatus {
-  DRAFT = 'draft',
-  PUBLISHED = 'published',
-  ANALYZING = 'analyzing',
-  COMPLETED = 'completed',
-  ARCHIVED = 'archived',
-}
+// 导出需求相关类型
+export * from './requirement'
 
-// AI 分析相关类型
-export interface AIAnalysis {
-  id: string
-  requirementId: string
-  feasibility: string
-  techStack: string[]
-  timeline: string
-  suggestions: string[]
-  created_at: string
-}
+// 导出 API 相关类型
+export * from './api'
 
-// API 响应类型
-export interface ApiResponse<T> {
-  success: boolean
-  data?: T
-  error?: {
-    code: string
-    message: string
-  }
-}
-
-// 分页相关类型
-export interface PaginatedResponse<T> {
-  items: T[]
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
-}
-
-export interface PaginationParams {
-  page?: number
-  pageSize?: number
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
-}
-
-// 过滤和搜索相关类型
-export interface RequirementFilters {
-  category?: string
-  tags?: string[]
-  status?: RequirementStatus
-  author?: string
-  searchQuery?: string
-  dateRange?: {
-    start: string
-    end: string
-  }
-}
-
-// 认证相关类型
-export interface LoginCredentials {
-  email: string
-  password: string
-}
-
-export interface RegisterData extends LoginCredentials {
-  username: string
-  passwordConfirmation: string
-}
-
-export interface AuthResponse {
-  user: User
-  token: string
-}
+// 导出通用类型
+export * from './common'

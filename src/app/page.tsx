@@ -6,41 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import apiClient from '@/lib/api-client'
 import { formatRelativeTime } from '@/lib/utils'
-
-interface User {
-  id: string
-  username: string
-  avatar?: string
-}
-
-interface Tag {
-  id: string
-  name: string
-}
-
-interface Requirement {
-  id: string
-  title: string
-  description: string
-  budget: number | null
-  deadline: string | null
-  status: string
-  created_at: string
-  user: User
-  tags: Tag[]
-  _count: {
-    comments: number
-    likes: number
-  }
-}
-
-interface RequirementListResponse {
-  items: Requirement[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
-}
+import type { Requirement, RequirementListResponse } from '@/types'
 
 // 热门标签
 const popularTags = [
@@ -144,7 +110,7 @@ export default function HomePage() {
               <span className="text-blue-600">连接创意与技术</span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-              在这里发布您的项目需求，或者寻找感兴趣的项目。我们致力��连接需求方和开发者，让每个创意都能找到最好的实现者。
+              在这里发布您的项目需求，或者寻找感兴趣的项目。我们致力连接需求方和开发者，让每个创意都能找到最好的实现者。
             </p>
             <div className="mt-10">
               <form
@@ -198,7 +164,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 平台数据统计 */}
+      {/* 平���数据统计 */}
       <div className="bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-4">
@@ -276,10 +242,10 @@ export default function HomePage() {
                   <div className="p-6">
                     <div className="flex items-center gap-x-4">
                       <time
-                        dateTime={requirement.created_at}
+                        dateTime={requirement.createdAt}
                         className="text-sm text-gray-500"
                       >
-                        {formatRelativeTime(requirement.created_at)}
+                        {formatRelativeTime(requirement.createdAt)}
                       </time>
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
@@ -334,7 +300,7 @@ export default function HomePage() {
                             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                           />
                         </svg>
-                        {requirement._count.comments}
+                        {requirement._count?.comments || 0}
                       </div>
                       <div className="flex items-center text-sm text-gray-500">
                         <svg
@@ -350,7 +316,7 @@ export default function HomePage() {
                             d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                           />
                         </svg>
-                        {requirement._count.likes}
+                        {requirement._count?.likes || 0}
                       </div>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
