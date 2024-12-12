@@ -34,7 +34,7 @@ export default function LoginPage() {
 
     try {
       await login(formData.email, formData.password)
-      console.log('成功')
+      // console.log('成功')
       router.push('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : '登录失败，请稍后重试')
